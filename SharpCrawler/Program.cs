@@ -75,7 +75,7 @@ namespace SharpCrawler
                     request.Headers.Add("Upgrade-Insecure-Requests: 1");
                     request.Referer = this.BaseLink.ToString() ;
                     WebRequests.Add(new DWebRequest(request, null));
-                    ////
+                    ///////
                 }
 
                 return 1;
