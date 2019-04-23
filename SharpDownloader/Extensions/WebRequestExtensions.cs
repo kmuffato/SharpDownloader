@@ -9,23 +9,47 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 
+
+/// <summary>
+/// Some of the methods used on the sources can be found on this link https://gist.github.com/abombss/2720757
+/// Special thanks to abombss for making our life easier
+/// </summary>
+
 namespace SharpDownloader.Extensions
 {
+    /// <summary>
+    /// Static class that provides cloning capabilities for <see cref="WebRequest"/>
+    /// </summary>
     public static class WebRequestExtensions
     {
+        /// <summary>
+        /// Clones a <see cref="HttpWebRequest"/> with all details except the content stream
+        /// </summary>
+        /// <param name="originalRequest">The Original <see cref="HttpWebRequest"/> needed to be cloned</param>
+        /// <param name="newUri">The new <see cref="Uri"/> that will be used to generate the new request for</param>
+        /// <returns><see cref="HttpWebRequest"/></returns>
         public static HttpWebRequest CloneRequest(this HttpWebRequest originalRequest, Uri newUri)
         {
             return CloneHttpWebRequest(originalRequest, newUri);
         }
-
+        /// <summary>
+        /// Converts the <see cref="HttpWebRequest"/> to a <see cref="WebRequest"/>
+        /// </summary>
+        /// <param name="originalRequest">The original <see cref="WebRequest"/> to be cloned</param>
+        /// <param name="newUri">The new <see cref="Uri"/> that will be used to generate the new request for</param>
+        /// <returns><see cref="WebRequest"/></returns>
         public static WebRequest CloneRequest(this WebRequest originalRequest, Uri newUri)
         {
-
-            var httpWebRequest = originalRequest as HttpWebRequest;
-            if (httpWebRequest != null) return CloneHttpWebRequest(httpWebRequest, newUri);
+            if (originalRequest is HttpWebRequest httpWebRequest) return CloneHttpWebRequest(httpWebRequest, newUri);
             return CloneWebRequest(originalRequest, newUri);
         }
 
+        /// <summary>
+        /// Clones <see cref="WebRequest"/> Properties, <see cref="HttpWebRequest"/> properties, and <see cref="HttpHeaderCollection"/> for the <see cref="HttpWebRequest"/>
+        /// </summary>
+        /// <param name="old">The original <see cref="WebRequest"/></param>
+        /// <param name="newUri">The new <see cref="Uri"/>, <see cref="WebRequest"/> to be cloned for</param>
+        /// <returns><see cref="HttpWebRequest"/></returns>
         private static HttpWebRequest CloneHttpWebRequest(HttpWebRequest old, Uri newUri)
         {
             var @new = (HttpWebRequest)WebRequest.Create(newUri);
@@ -35,6 +59,12 @@ namespace SharpDownloader.Extensions
             return @new;
         }
 
+        /// <summary>
+        /// Clones <see cref="WebRequest"/> Properties and <see cref="WebHeaderCollection"/> for the <see cref="WebRequest"/>
+        /// </summary>
+        /// <param name="old">The original <see cref="WebRequest"/></param>
+        /// <param name="newUri">The new <see cref="Uri"/>, <see cref="WebRequest"/> to be cloned for</param>
+        /// <returns><see cref="WebRequest"/></returns>
         private static WebRequest CloneWebRequest(WebRequest old, Uri newUri)
         {
             var @new = WebRequest.Create(newUri);
@@ -42,7 +72,11 @@ namespace SharpDownloader.Extensions
             CopyWebRequestHeaders(old, @new);
             return @new;
         }
-
+        /// <summary>
+        /// Copies properties from the original <see cref="WebRequest"/> to a new <see cref="WebRequest"/>
+        /// </summary>
+        /// <param name="old">"/>Origninal <see cref="WebRequest"/></param>
+        /// <param name="new">New <see cref="WebRequest"/></param>
         private static void CopyWebRequestProperties(WebRequest old, WebRequest @new)
         {
             @new.AuthenticationLevel = old.AuthenticationLevel;
@@ -59,7 +93,11 @@ namespace SharpDownloader.Extensions
 
             if (old.ContentLength > 0) @new.ContentLength = old.ContentLength;
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="old"></param>
+        /// <param name="new"></param>
         private static void CopyWebRequestHeaders(WebRequest old, WebRequest @new)
         {
             string[] allKeys = old.Headers.AllKeys;
@@ -68,7 +106,11 @@ namespace SharpDownloader.Extensions
                 @new.Headers[key] = old.Headers[key];
             }
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="old"></param>
+        /// <param name="new"></param>
         private static void CopyHttpWebRequestProperties(HttpWebRequest old, HttpWebRequest @new)
         {
             @new.Accept = old.Accept;
@@ -98,7 +140,11 @@ namespace SharpDownloader.Extensions
             @new.UnsafeAuthenticatedConnectionSharing = old.UnsafeAuthenticatedConnectionSharing;
             @new.UserAgent = old.UserAgent;
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="old"></param>
+        /// <param name="new"></param>
         private static void CopyHttpWebRequestHeaders(HttpWebRequest old, HttpWebRequest @new)
         {
             var allKeys = old.Headers.AllKeys;
@@ -127,7 +173,13 @@ namespace SharpDownloader.Extensions
                 }
             }
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="BaseUri"></param>
+        /// <param name="EmptyHeaders"></param>
+        /// <param name="httpMethod"></param>
+        /// <returns></returns>
         public static WebRequest BuildRequest(Uri BaseUri, bool EmptyHeaders = false, String httpMethod = "GET")
         {
             HttpWebRequest @request = (HttpWebRequest)WebRequest.Create(BaseUri);
@@ -144,7 +196,12 @@ namespace SharpDownloader.Extensions
             @request.KeepAlive = true;
             return @request;
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="BaseUri"></param>
+        /// <param name="QueryParameters"></param>
+        /// <returns></returns>
         public static WebRequest BuildRequest(Uri BaseUri, NameValueCollection QueryParameters)
         {
             var parameters = QueryParameters.BuildFormData();
@@ -159,7 +216,13 @@ namespace SharpDownloader.Extensions
             @request.KeepAlive = true;
             return @request;
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="BaseUri"></param>
+        /// <param name="SubDomain"></param>
+        /// <param name="item"></param>
+        /// <returns></returns>
         public static WebRequest BuildRequest(Uri BaseUri, string SubDomain, string item)
         {
 
@@ -173,6 +236,11 @@ namespace SharpDownloader.Extensions
             @request.KeepAlive = true;
             return @request;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="collection"></param>
+        /// <returns></returns>
         public static string BuildFormData(this NameValueCollection collection)
         {
 
@@ -190,6 +258,11 @@ namespace SharpDownloader.Extensions
             }
             return query;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="collection"></param>
+        /// <returns></returns>
         public static string BuildFormDataFromDictionary(this Dictionary<string, string> collection)
         {
             string itemBuild = "";
@@ -205,34 +278,5 @@ namespace SharpDownloader.Extensions
         }
     }
 
-    public class DWebRequest
-    {
-
-        public WebRequest WebRequest { get; set; }
-
-        public Dictionary<string, string> FormData { get; set; }
-
-        public string GetFormDataCollection { get { return BuildFormData(); } }
-
-        public bool UsingParams { get; set; }
-
-        public string CurrentValue { get; set; }
-
-        public DWebRequest(WebRequest webRequest, Dictionary<string, string> formdata)
-        {
-            this.WebRequest = webRequest;
-            this.FormData = formdata;
-        }
-
-
-        private string BuildFormData()
-        {
-            string query = "";
-            if (FormData != null)
-            {
-                query = new FormUrlEncodedContent(FormData).ToString();
-            }
-            return query;
-        }
-    }
+    
 }

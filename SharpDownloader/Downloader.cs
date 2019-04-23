@@ -11,51 +11,145 @@ using SharpDownloader.Extensions;
 
 namespace SharpDownloader
 {
-    public enum StatusEnum { Idle = 0, Running = 1, ChangeProxy = 2, Finished = 3 }
+    /// <summary>
+    /// Progress of the current downloading site
+    /// </summary>
+    public enum StatusEnum {
+        /// <summary>
+        /// Reports that the downloading has not started yet
+        /// </summary>
+        Idle = 0,
+        /// <summary>
+        /// Reports that the downloading is currently running
+        /// </summary>
+        Running = 1,
+        /// <summary>
+        /// Reports that the current task is searching for a new pproxy server of type <see cref="WebProxy"/>
+        /// </summary>
+        ChangeProxy = 2,
+        /// <summary>
+        /// Reports that the processing of provided <see cref="WebRequest"/> has been finished 
+        /// </summary>
+        Finished = 3 }
+    
+    /// <summary>
+    /// Base class that implements the capability of downloading concurrent <see cref="WebRequest"/> type objects
+    /// </summary>
     public class Downloader
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public static readonly string[] ReportingHeader = { "Base Link", "Total Count", "Current Link", "Total Downloaded", "Status" };
-
+        /// <summary>
+        /// 
+        /// </summary>
         public string[] ReportValues => new string[] { BaseLink.ToString(), Total_Count.ToString(), CurrentID?.ToString(), Total_Downloaded.ToString(), Status };
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public delegate Task<int> BuildRequests();
+        /// <summary>
+        /// 
+        /// </summary>
         public event BuildRequests OnBuildRequests;
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public delegate Task<int> ReleaseResources();
+        /// <summary>
+        /// 
+        /// </summary>
         public event ReleaseResources OnReleaseResources;
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public delegate Task<string> ProxyChange();
+        /// <summary>
+        /// 
+        /// </summary>
         public event ProxyChange OnProxyChange;
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="_baseLink"></param>
+        /// <param name="content"></param>
+        /// <returns></returns>
         public delegate Task ResponseReturend(string _baseLink, string content);
+        /// <summary>
+        /// 
+        /// </summary>
         public event ResponseReturend OnResponseReturned;
-
+        /// <summary>
+        /// 
+        /// </summary>
         public SemaphoreSlim semaphore = new SemaphoreSlim(1, 1);
-
+        /// <summary>
+        /// 
+        /// </summary>
         public BlockingCollection<DWebRequest> WebRequests = new BlockingCollection<DWebRequest>();
-
+        /// <summary>
+        /// 
+        /// </summary>
         protected BlockingCollection<string> SavedLinks = new BlockingCollection<string>();
 
         #region Reporting
+        /// <summary>
+        /// 
+        /// </summary>
         public Uri BaseLink { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public int Total_Count { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public string CurrentID = "";
-
+        /// <summary>
+        /// 
+        /// </summary>
         public int Total_Downloaded { get { return total_downloaded; } }
-
+        /// <summary>
+        /// 
+        /// </summary>
         public int total_downloaded;
+        /// <summary>
+        /// 
+        /// </summary>
         public string Status { get; set; }
         #endregion
 
         #region Synch
+        /// <summary>
+        /// 
+        /// </summary>
         public Object _LockObject = new object();
         #endregion
-
+        /// <summary>
+        /// 
+        /// </summary>
         public int NumberOfProcessors { get; set; }
-
+        /// <summary>
+        /// 
+        /// </summary>
         public string CookieContainer { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public bool Testing { get; set; }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="_BaseLink"></param>
+        /// <param name="Testing"></param>
+        /// <param name="_NumberOfProcessors"></param>
+        /// <param name="Expect100"></param>
         public Downloader(string _BaseLink, bool Testing = false, int _NumberOfProcessors = 0, bool Expect100 = false)
         {
 
@@ -78,7 +172,9 @@ namespace SharpDownloader
             }
 
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
         private void SetExpect100()
         {
             ServicePointManager.UseNagleAlgorithm = true;
@@ -86,12 +182,12 @@ namespace SharpDownloader
             ServicePointManager.CheckCertificateRevocationList = true;
             ServicePointManager.DefaultConnectionLimit = ServicePointManager.DefaultPersistentConnectionLimit;
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public async Task StartDownloadAsync()
         {
-
-
-
             //await GetCookies();
             Console.WriteLine($"Starting WebRequest Build Process, Current Count {0}");
             Total_Count = await OnBuildRequests();
@@ -104,12 +200,13 @@ namespace SharpDownloader
             {
                 await ProcessLinksTesting();
             }
-
             await OnReleaseResources();
-
         }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public async Task ProcessLinksAsync()
         {
 
@@ -130,7 +227,10 @@ namespace SharpDownloader
             await Task.WhenAll(RunningTasks.ToArray());
             Status = StatusEnum.Finished.ToString();
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public async Task ProcessLinksTesting()
         {
 
@@ -149,7 +249,9 @@ namespace SharpDownloader
             await Task.WhenAll(RunningTasks.ToArray());
             Status = StatusEnum.Finished.ToString();
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
         public void ProcessRequestAsync()
         {
             try
@@ -213,7 +315,12 @@ namespace SharpDownloader
                 Console.WriteLine(ex.Message + BaseLink);
             }
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="Proxy"></param>
+        /// <returns></returns>
         public Task<int> SendRequestAsync(DWebRequest request, string Proxy = "")
         {
             return Task.Run(async () =>
@@ -328,7 +435,10 @@ namespace SharpDownloader
 
 
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public async Task<string> GetCookies()
         {
             int RetryTimes = 5;
@@ -359,7 +469,6 @@ namespace SharpDownloader
                         RetryTimes--;
                         if (RetryTimes > 0)
                         {
-
                             try
                             {
                                 Proxy = OnProxyChange().Result;
@@ -380,21 +489,9 @@ namespace SharpDownloader
                 {
                     Console.Write("Error: {0}", ex.Status + BaseLink.Host);
                 }
-
-
-
-
             }
-
-
-
             return "";
         }
-
-        
-
-
-
     }
 
 }

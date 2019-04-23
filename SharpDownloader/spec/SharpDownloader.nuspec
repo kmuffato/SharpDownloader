@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>ShyqyriRama</authors>
+    <owners>$author$</owners>
+    <licenseUrl>https://github.com/shyqrirama/SharpDownloader/blob/master_/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/shyqrirama/SharpDownloader</projectUrl>
+    <iconUrl>https://github.com/shyqrirama/SharpDownloader/blob/master_/icon.ico</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>C# Engine to download multiple WebRequests in Paralel with TLP and Concurrent Blocking COllection</description>
+    <releaseNotes>Inital Project Structure</releaseNotes>
+    <copyright>Copyright 2019</copyright>
+    <tags>TLP ConcurrentQueue Processing Task Thread WebRequest HttpClient HttpWebResponse C# Downloading Engine</tags>
+  </metadata>
+</package>
