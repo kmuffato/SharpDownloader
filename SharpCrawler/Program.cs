@@ -15,7 +15,7 @@ namespace SharpCrawler
         {
             SharpDownloaderManager downloaders = new SharpDownloaderManager(new SharpDownloaderSettings());
 
-            downloaders.Add(new Down("https://www.alabamagis.com/Bullock/CamaTemplates/reports/prc_Main.CFM", false));
+            downloaders.Add(new Down("https:// .... link", false));
 
             downloaders.StartDownloading();
 
@@ -60,7 +60,7 @@ namespace SharpCrawler
         private Task<int> Down_OnBuildRequests()
         {
             return Task.Run(() => { 
-                foreach (string item1 in System.IO.File.ReadAllLines("ALBullockCounty.txt"))
+                foreach (string item1 in System.IO.File.ReadAllLines(""))
                 {
 
                     string[] item = item1.Split('|');

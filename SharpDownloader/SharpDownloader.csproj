@@ -21,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\SharpDownloader.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -46,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Downloader.cs" />
+    <Compile Include="DownloaderWebRequest.cs" />
     <Compile Include="Extensions\ConsoleExtensions.cs" />
     <Compile Include="Extensions\ContentExtensions.cs" />
     <Compile Include="Extensions\WebRequestExtensions.cs" />
